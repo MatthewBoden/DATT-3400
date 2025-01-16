@@ -1,0 +1,7 @@
+// BY Matthew Bodenstein (217996505)
+// Data source: NASA's Zonal Annual Means
+// https://data.giss.nasa.gov/gistemp/tabledata_v4/ZonAnn.Ts+dSST.csv
+
+Part 1:
+
+The data used in this project comes from NASA's Zonal Annual Means dataset, specifically the CSV file containing global temperature anomalies across different latitudes and years. I accessed the dataset through NASA's GISS website and formatted it to extract the necessary temperature anomaly values. I find this data particularly interesting because it provides a clear, quantitative representation of how global temperatures have changed over time, which can be visually represented in a meaningful way. By integrating this data into the generative artwork, I aim to create an interactive experience that reflects real-world climate trends dynamically and engagingly. The data from the CSV file is being used to control various aspects of the generative artwork. The glob values (representing temperature anomalies) are mapped to influence the height of the wave-like movements of the cubes, with higher values causing more significant vertical displacement. These glob values also control the colour of the cubes, transitioning dynamically between red, green, and blue, depending on the temperature anomaly. Additionally, the position of each cube in the grid corresponds to a specific glob value, creating a visually engaging, data-driven animation that changes over time as the values shift.
