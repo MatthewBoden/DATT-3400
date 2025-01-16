@@ -1,0 +1,2 @@
+Generative research and development document - 20% - Ongoing
+Each week collect: One reference/inspiration, share one creative coding project or project plan done outside of class, a tool, technique, library or tutorial you want to learn more about. Share these in your DATT3400 github folder - either in a weekly folder or collated PDF.  
