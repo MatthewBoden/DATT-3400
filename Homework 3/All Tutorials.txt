@@ -1,0 +1,17 @@
+Homework: TouchDesigner practice
+
+Practice TouchDesigner
+Use TouchDesigner for at least 3 * 30 minute sessions. 
+Familiarise yourself with the UI, look through the example project files, try changing parameters, adding nodes etc…. Don’t worry about breaking things, this is learning/experimentation!
+
+Tutorial
+Find and complete at least 1 * tutorial. 
+Upload the completed TouchDesigner file, along with a link to the tutorial to your Github.
+Submit the link to eclass.  
+
+
+All Tutorials used:
+HWT1 * [BeginnerFriendly] Touchdesigner Tutorial01: Fluffy The Noise - https://www.youtube.com/watch?v=6szCrmdyoAw&ab_channel=DeRe
+HWT2 * [BeginnerFriendly] Touchdesigner Tutorial02: Interactive Sphere wt mouseIn - https://www.youtube.com/watch?v=JfyDtD7UwU8&ab_channel=DeRe
+HWT3 * [Beginner-Intermediate] Touchdesigner Tutorial03: Ghostly Blossomed - https://www.youtube.com/watch?v=M6dsTLZo5jU&ab_channel=DeRe 
+
