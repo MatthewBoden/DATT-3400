@@ -12,3 +12,4 @@ All links for Homework Assignments on p5js.org
 
 [Homework 2 Assignment: Unique Randomness](https://editor.p5js.org/MatthewBoden/sketches/AYNwtZ6c8)
 
+[Homework 3: TouchDesigner practice]()
