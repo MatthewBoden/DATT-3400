@@ -15,3 +15,5 @@ All links for Homework Assignments on p5js.org
 [Homework 3: TouchDesigner practice](https://github.com/MatthewBoden/DATT-3400/tree/main/Homework%203)
 
 [Homework 4: TouchDesigner practice 2](https://github.com/MatthewBoden/DATT-3400/tree/main/Homweork%204)
+
+[Homework 5: TouchDesigner Dome previz]()
