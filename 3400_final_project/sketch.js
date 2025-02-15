@@ -6,21 +6,35 @@ let fingersUpList = [];
 
 const fingerNames = ["Thumb", "Index", "Middle", "Ring", "Pinky"];
 let blackHoleCanvas;
+let particles = [];
+const numBaseParticles = 500;
+let showVideo = true; // Toggle video display
+
+// Stars array to store positions of the stars
+let stars = [];
+const numStars = 200; // Number of stars
 
 function setup() {
-  createCanvas(1200, 800); // Larger for black hole focus DO NOT TOUCH
-
-  blackHoleCanvas = createGraphics(900, 800); // Large black hole canvas DO NOT TOUCH
-
+  createCanvas(1200, 800);
+  blackHoleCanvas = createGraphics(900, 800);
   video = createCapture(VIDEO);
-  video.size(250, 180); // Smaller camera DO NOT TOUCH
+  video.size(250, 180);
   video.hide();
-
+  
   console.log("Loading ML5 Handpose model...");
   handpose = ml5.handpose(video, modelReady);
   handpose.on("predict", results => {
     predictions = results;
   });
+
+  for (let i = 0; i < numBaseParticles; i++) {
+    particles.push(new Particle());
+  }
+
+  // Generate stars
+  for (let i = 0; i < numStars; i++) {
+    stars.push(createVector(random(width), random(height)));
+  }
 }
 
 function modelReady() {
@@ -29,22 +43,23 @@ function modelReady() {
 
 function draw() {
   background(0);
-
-  // Draw black hole (main focus)
+  
+  // Draw stars before the black hole
+  drawStars();
+  
   drawBlackHole();
-  image(blackHoleCanvas, 150, 0); // Center the black hole
+  image(blackHoleCanvas, 150, 0);
+  
+  // Toggle video display based on showVideo
+  if (showVideo) {
+    push();
+    translate(width - 260, height - 190);
+    scale(-1, 1);
+    image(video, -250, 0, 250, 180);
+    pop();
+  }
 
-  // Draw the smaller camera feed in the bottom-right corner
-  push();
-  translate(width - 260, height - 190); // Adjusted for proper fit
-  scale(-1, 1); // Mirror camera
-  image(video, -250, 0, 250, 180);
-  pop();
-
-  // Draw hand tracking over the camera feed
   drawHand();
-
-  // Display finger count
   fill(255);
   textSize(24);
   textAlign(CENTER, CENTER);
@@ -52,96 +67,211 @@ function draw() {
   text(`Raised: ${fingersUpList.length > 0 ? fingersUpList.join(", ") : "None"}`, width / 2, 720);
 }
 
-// -------------------------------------------------- HAND LOGIC --------------------------------------------------
-// Hand tracking function DO NOT TOUCH
+function drawStars() {
+  // Draw random white dots (stars)
+  for (let i = 0; i < stars.length; i++) {
+    fill(255, 255, 255, random(50, 150));  // Random alpha for twinkling effect
+    noStroke();
+    ellipse(stars[i].x, stars[i].y, random(1, 3), random(1, 3));  // Small random-sized stars
+  }
+}
+
 function drawHand() {
   if (predictions.length > 0) {
     let hand = predictions[0];
     let landmarks = hand.landmarks;
-
     let result = countFingers(landmarks);
     fingersUp = result.count;
     fingersUpList = result.names;
 
     for (let i = 0; i < landmarks.length; i++) {
       let [x, y] = landmarks[i];
-
-      // Scale X to video width (250px) and flip for mirroring
       let screenX = map(x, 0, 290, 0, 250/2);
-      let mirroredX = width - screenX; 
-      console.log(video.width);
-
-      // Scale Y to video height (180px)
+      let mirroredX = width - screenX;
       let screenY = map(y, 0, 260, 0, 180/2);
-      let finalY = screenY + (height - 180); // Align with bottom video feed
-
-      // Draw the hand point with smaller circles for better accuracy
+      let finalY = screenY + (height - 180);
       fill(0, 255, 0);
       noStroke();
-      ellipse(mirroredX, finalY, 4, 4); // Slightly smaller for precision
+      ellipse(mirroredX, finalY, 4, 4);
     }
   }
 }
 
-// Count raised fingers
 function countFingers(landmarks) {
   let count = 0;
   let raisedFingers = [];
-
   if (!landmarks || landmarks.length < 21) return { count: 0, names: [] };
-
-  // Thumb: Compare tip (4) to knuckle (2)
   let thumbUp = landmarks[4][0] > landmarks[3][0];
   if (thumbUp) {
     count++;
     raisedFingers.push("Thumb");
   }
-
-  // Other fingers: Check if tip (8, 12, 16, 20) is above lower joint (6, 10, 14, 18)
   let fingers = [8, 12, 16, 20];
   let bases = [6, 10, 14, 18];
-
   for (let i = 0; i < fingers.length; i++) {
     if (landmarks[fingers[i]][1] < landmarks[bases[i]][1]) {
       count++;
       raisedFingers.push(fingerNames[i + 1]);
     }
   }
-
   return { count, names: raisedFingers };
 }
-// ------------------------------------------------ END HAND LOGIC ------------------------------------------------
 
-
-// Black hole visualization
 function drawBlackHole() {
   blackHoleCanvas.clear();
-  blackHoleCanvas.background(10);
-
+  blackHoleCanvas.fill(0, 10);
+  blackHoleCanvas.rect(0, 0, 900, 800);
   blackHoleCanvas.push();
-  blackHoleCanvas.translate(450, 400); // Center black hole
+  blackHoleCanvas.translate(450, 400);
+  
+  // Shrink the center when no fingers are up
+  let centerSize;
 
-  // Event Horizon
+  if (fingersUpList.length === 0) {
+    centerSize = 50;
+  } else if (fingersUpList.length === 1) {
+    centerSize = 70;
+  } else if (fingersUpList.length === 2) {
+    centerSize = 100;
+  } else if (fingersUpList.length === 3) {
+    centerSize = 150;
+  } else if (fingersUpList.length === 4) {
+    centerSize = 170;
+  } else {
+    centerSize = 200;  // Default case if fingersUpList.length is more than 4
+  }
+  
+  // Draw the event horizon with dynamic center size
   blackHoleCanvas.fill(0);
-  blackHoleCanvas.ellipse(0, 0, 200, 200);
+  blackHoleCanvas.noStroke();
+  blackHoleCanvas.ellipse(0, 0, centerSize, centerSize); // This represents the shrinking/expanding center
+  
+  drawEventHorizon();
+  updateParticles();
+  blackHoleCanvas.pop();
+}
 
-  // Accretion Disk
-  let numParticles = 200 + fingersUp * 20;
-  let timeFactor = frameCount * 0.01 * fingersUp;
+function drawEventHorizon() {
+  blackHoleCanvas.fill(0);
+  blackHoleCanvas.noStroke();
+  
+  // Shrink the black hole's center when no fingers are up
+  let size;
 
-  for (let i = 0; i < numParticles; i++) {
-    let angle = map(i, 0, numParticles, 0, TWO_PI) + timeFactor;
-    let radius = 100 + noise(i * 0.1, frameCount * 0.005) * 50;
-
-    let x = radius * cos(angle);
-    let y = radius * sin(angle);
-
-    let brightness = map(radius, 100, 150, 255, 150);
-
-    blackHoleCanvas.fill(255, brightness, 0, 150);
-    blackHoleCanvas.noStroke();
-    blackHoleCanvas.ellipse(x, y, 5, 5);
+  if (fingersUpList.length === 0) {
+    size = 50;
+  } else if (fingersUpList.length === 1) {
+    size = 70;
+  } else if (fingersUpList.length === 2) {
+    size = 100;
+  } else if (fingersUpList.length === 3) {
+    size = 150;
+  } else if (fingersUpList.length === 4) {
+    size = 170;
+  } else {
+    size = 200;  // Default case if fingersUpList.length is more than 4
   }
 
-  blackHoleCanvas.pop();
+
+  blackHoleCanvas.ellipse(0, 0, size, size);
+} 
+
+function updateParticles() {
+  // Dynamically calculate the number of particles based on fingers up
+  let numParticles = numBaseParticles + fingersUp * 100;
+  
+  // Adjust the black hole center size based on fingersUpList length
+  let centerSize;
+
+  if (fingersUpList.length === 0) {
+    centerSize = 50;
+  } else if (fingersUpList.length === 1) {
+    centerSize = 70;
+  } else if (fingersUpList.length === 2) {
+    centerSize = 100;
+  } else if (fingersUpList.length === 3) {
+    centerSize = 150;
+  } else if (fingersUpList.length === 4) {
+    centerSize = 170;
+  } else {
+    centerSize = 200;  // Default case if fingersUpList.length is more than 4
+  }
+
+  
+  // Ensure particles array matches the current number of particles
+  while (particles.length < numParticles) {
+    particles.push(new Particle(true, centerSize)); // Pass center size to Particle constructor
+  }
+  while (particles.length > numParticles) {
+    particles.pop();
+  }
+  
+  // Update and display each particle based on the new center size
+  for (let p of particles) {
+    p.update(centerSize);  // Update particle position based on new center size
+    p.display();
+  }
+}
+
+function keyPressed() {
+  // Toggle the video display when the 'v' key is pressed
+  if (key === 'v' || key === 'V') {
+    showVideo = !showVideo;
+  }
+}
+
+class Particle {
+  constructor(fromHorizon = false, centerSize = 200) {
+    this.centerSize = centerSize;  // Store the current center size
+    
+    if (fromHorizon) {
+      this.angle = random(TWO_PI);
+      this.radius = centerSize * 1.5;  // Start particles just outside the center
+    } else {
+      this.angle = random(TWO_PI);
+      this.radius = random(centerSize * 0.65, centerSize * 1.5);  // Dynamic radius based on the center size
+    }
+    this.x = this.radius * cos(this.angle);
+    this.y = this.radius * sin(this.angle);
+    this.speed = random(0.5, 2);
+    this.angularSpeed = random(0.02, 0.05);
+    this.trail = [];
+    this.updateColor();
+  }
+
+  updateColor() {
+    if (fingersUpList.includes("Index") && fingersUpList.includes("Pinky") && (fingersUpList.length == 2)) {
+      this.color = color(255, 0, 0);
+    } else {
+      this.color = color(255, random(100, 255), 0, 200);
+    }
+  }
+
+  update(centerSize) {
+    // Adjust particle radius and angle
+    this.centerSize = centerSize;  // Update with the new center size
+    this.angle += this.angularSpeed;
+    this.radius -= this.speed * (1 + fingersUp * 0.1);
+
+    // Keep the radius within limits of the new center size
+    if (this.radius < centerSize * 0.65) {
+      this.radius = centerSize * 1.5;
+      this.angle = random(TWO_PI);
+    }
+    this.x = this.radius * cos(this.angle);
+    this.y = this.radius * sin(this.angle);
+    this.trail.push({ x: this.x, y: this.y, color: this.color });
+    if (this.trail.length > 20) {
+      this.trail.shift();
+    }
+  }
+
+  display() {
+    for (let i = 0; i < this.trail.length; i++) {
+      let alpha = map(i, 0, this.trail.length, 50, 200);
+      blackHoleCanvas.fill(red(this.trail[i].color), green(this.trail[i].color), blue(this.trail[i].color), alpha);
+      blackHoleCanvas.noStroke();
+      blackHoleCanvas.ellipse(this.trail[i].x, this.trail[i].y, 5, 5);
+    }
+  }
 }
