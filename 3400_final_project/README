@@ -16,20 +16,20 @@ This project simulates the manipulation of a black hole using hand gestures. Use
 ## Description
 
 This is an interactive black hole simulation. By using your hand, you can manipulate various aspects of the black hole and stars:
-- The more fingers you hold up, the larger the black holes center of mass.
+- The more fingers you hold up, the larger the black hole's center of mass.
 - You can toggle between red, blue, or rainbow trails for the stars.
-- The black holes behavior changes based on the number of raised fingers.
+- The black hole's behavior changes based on the number of raised fingers.
 
 ## Features
 
-- **Hand Tracking**: The simulation uses real-time hand tracking via `ml5.js`s Handpose model to detect gestures.
+- **Hand Tracking**: The simulation uses real-time hand tracking via `ml5.js`'s Handpose model to detect gestures.
 - **Interactive Star Effects**: Users can influence the star patterns and trails around the black hole.
 - **Dynamic Black Hole**: The size and properties of the black hole adjust in real time based on the number of fingers held up.
 - **Video Overlay**: Toggle the video stream of your hand gesture input.
 
 ## Run
 - Click this link and make sure 'auto refresh' is turned on
-- Press the play button
+- Press the play button  
   [Final Project](https://editor.p5js.org/MatthewBoden/sketches/nWDu9yRza)
 
 ## Libraries Used
@@ -43,5 +43,5 @@ This is an interactive black hole simulation. By using your hand, you can manipu
 1. The `ml5.js` Handpose model is used to detect and track hand gestures.
 2. The number of raised fingers and their combinations influence various properties of the black hole and stars:
    - The number of raised fingers adjusts the size of the black hole.
-   - Different gestures change the colour and trail effects of the stars.
+   - Different gestures change the color and trail effects of the stars.
 3. The simulation uses `p5.js` to visualize the black hole, stars, and hand gesture inputs.
