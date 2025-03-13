@@ -1,0 +1,47 @@
+# Black Hole Manipulation
+
+This project simulates the manipulation of a black hole using hand gestures. Users can control the size, speed, number of stars, colors, and more by using their fingers. It leverages machine learning for hand detection with the `ml5.js` Handpose model, and the simulation visualizes the effects of finger gestures on the black hole and stars.
+
+## Controls
+
+- **Auto-Refresh**: Press the button and then press **Play**.
+- **Hand Gestures**:
+  - **Red Stars**: Hold up **Index** & **Pinky**.
+  - **Blue Stars**: Hold up **Thumb**, **Index**, & **Pinky**.
+- **Pause Simulation**: Press the **Pause** button in the top left.
+- **Toggle Camera**: Press the **Toggle Video** button or press **V** to toggle the camera.
+- **Rainbow Trails**: Press the **Rainbow Trail** button to toggle rainbow trails.
+- **Star Trails Length**: Use the slider at the bottom to change the length of the star trails.
+
+## Description
+
+This is an interactive black hole simulation. By using your hand, you can manipulate various aspects of the black hole and stars:
+- The more fingers you hold up, the larger the black holes center of mass.
+- You can toggle between red, blue, or rainbow trails for the stars.
+- The black holes behavior changes based on the number of raised fingers.
+
+## Features
+
+- **Hand Tracking**: The simulation uses real-time hand tracking via `ml5.js`s Handpose model to detect gestures.
+- **Interactive Star Effects**: Users can influence the star patterns and trails around the black hole.
+- **Dynamic Black Hole**: The size and properties of the black hole adjust in real time based on the number of fingers held up.
+- **Video Overlay**: Toggle the video stream of your hand gesture input.
+
+## Run
+- Click this link and make sure 'auto refresh' is turned on
+- Press the play button
+  [Final Project](https://editor.p5js.org/MatthewBoden/sketches/nWDu9yRza)
+
+## Libraries Used
+
+- **p5.js**: A JavaScript library for creative coding.
+- **ml5.js**: A library for machine learning in the browser, used here for hand pose detection.
+- **p5.gui**: A simple interface for creating GUI elements.
+
+## How it Works
+
+1. The `ml5.js` Handpose model is used to detect and track hand gestures.
+2. The number of raised fingers and their combinations influence various properties of the black hole and stars:
+   - The number of raised fingers adjusts the size of the black hole.
+   - Different gestures change the colour and trail effects of the stars.
+3. The simulation uses `p5.js` to visualize the black hole, stars, and hand gesture inputs.
