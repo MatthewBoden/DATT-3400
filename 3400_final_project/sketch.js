@@ -1,3 +1,22 @@
+/*  
+  Matthew Bodenstein 
+  Black Hole Manipulation
+
+--------- Controls ---------
+  Press Auto-Refresh then press Play
+  Hold up Index & Pinky for Red Stars
+  Hold up Thumb & Index & Pinky for Blue Stars
+  Press Pause button in top left to pause simulation
+  Press Toggle Video or Press V to toggle camera
+  Press Rainbow Trail to toggle rainbow trails
+  Use the slider at the bottom to change the length of the star trails
+
+-------- Description --------
+  This is a black hole manipulation simulation.
+  Use your hand to control the size, speed, number of stars, colour, and more!
+  The more fingers up the bigger the center of mass, 5 is the most, 0 is the least
+*/
+
 let video;
 let handpose;
 let predictions = [];
@@ -13,6 +32,16 @@ let showVideo = true; // Toggle video display
 // Stars array to store positions of the stars
 let stars = [];
 const numStars = 200; // Number of stars
+
+let gui;
+let toggle_video;
+let slider;
+
+let colorModeButton;
+let colorMode = "default";
+
+let pauseButton;
+let isPaused = false;
 
 function setup() {
   createCanvas(1200, 800);
@@ -35,6 +64,44 @@ function setup() {
   for (let i = 0; i < numStars; i++) {
     stars.push(createVector(random(width), random(height)));
   }
+  
+  gui = createGui();
+  toggle_video = createButton("Video on/off", width - 200, 550);
+  slider = createSlider("Slider", width/2 - 100, 770, 200, 32, 5, 20);
+  colorModeButton = createButton("Rainbow Trail", width - 200, 500);
+  pauseButton = createButton("||", 30, 30, 50, 50);
+  setStyles();
+}
+
+
+function setStyles(){
+    toggle_video.setStyle({
+      fillBg: color(50, 50, 50),   // Dark gray background
+      fillBgHover: color(80, 80, 80), // Lighter gray when hovered
+      strokeBg: color(255, 255, 255), // White border
+      fillLabel: color(255, 255, 255), // White text
+    });
+
+  colorModeButton.setStyle({
+      fillBg: color(255, 0, 150),  // Bright pink background
+      fillBgHover: color(255, 50, 200), // Lighter pink on hover
+      strokeBg: color(0), // Black border
+      fillLabel: color(255), // White text
+    });
+
+  pauseButton.setStyle({
+    fillBg: color(200, 0, 0),  // Red background
+    fillBgHover: color(255, 50, 50), // Lighter red hover
+    strokeBg: color(255, 255, 255), // White border
+    fillLabel: color(255), // White text
+  });
+
+  slider.setStyle({
+    fillTrack: color(100),  // Gray track
+    fillTrackHover: color(150), // Lighter gray on hover
+    fillHandle: color(0, 150, 255), // Blue handle
+    fillHandleHover: color(0, 200, 255), // Brighter blue handle on hover
+  });
 }
 
 function modelReady() {
@@ -65,7 +132,28 @@ function draw() {
   textAlign(CENTER, CENTER);
   text(`Fingers Up: ${fingersUp}`, width / 2, 750);
   text(`Raised: ${fingersUpList.length > 0 ? fingersUpList.join(", ") : "None"}`, width / 2, 720);
+  
+  drawGui();
+  guiHandeler();
+  
 }
+
+
+function guiHandeler(){
+  
+  if(toggle_video.isPressed){
+      showVideo = !showVideo;
+      }
+  
+  if (colorModeButton.isPressed) {
+    colorMode = colorMode === "default" ? "rainbow" : "default";
+  }
+  
+  if (pauseButton.isPressed) {
+    isPaused = !isPaused;
+  }
+}
+
 
 function drawStars() {
   // Draw random white dots (stars)
@@ -207,9 +295,11 @@ function updateParticles() {
   }
   
   // Update and display each particle based on the new center size
-  for (let p of particles) {
-    p.update(centerSize);  // Update particle position based on new center size
-    p.display();
+  if (!isPaused) {
+    for (let p of particles) {
+      p.update(centerSize);
+      p.display();
+    }
   }
 }
 
@@ -240,28 +330,36 @@ class Particle {
   }
 
   updateColor() {
-    if (fingersUpList.includes("Index") && fingersUpList.includes("Pinky") && (fingersUpList.length == 2)) {
+    if (colorMode === "rainbow") {
+    this.color = color(random(255), random(255), random(255));
+  } else if (fingersUpList.includes("Index") && fingersUpList.includes("Pinky") && (fingersUpList.length == 2)) {
       this.color = color(255, 0, 0);
-    } else {
+    } else if (fingersUpList.includes("Index") && fingersUpList.includes("Pinky") && fingersUpList.includes("Thumb") &&(fingersUpList.length == 3)) {
+      this.color = color(0, 0, 255);
+    }
+    else {
       this.color = color(255, random(100, 255), 0, 200);
     }
   }
 
   update(centerSize) {
-    // Adjust particle radius and angle
-    this.centerSize = centerSize;  // Update with the new center size
+    this.centerSize = centerSize;
     this.angle += this.angularSpeed;
     this.radius -= this.speed * (1 + fingersUp * 0.1);
 
-    // Keep the radius within limits of the new center size
     if (this.radius < centerSize * 0.65) {
       this.radius = centerSize * 1.5;
       this.angle = random(TWO_PI);
     }
+
     this.x = this.radius * cos(this.angle);
     this.y = this.radius * sin(this.angle);
+
     this.trail.push({ x: this.x, y: this.y, color: this.color });
-    if (this.trail.length > 20) {
+
+    // Limit trail length based on slider value
+    let maxTrailLength = slider.val; 
+    if (this.trail.length > maxTrailLength) {
       this.trail.shift();
     }
   }
@@ -269,9 +367,17 @@ class Particle {
   display() {
     for (let i = 0; i < this.trail.length; i++) {
       let alpha = map(i, 0, this.trail.length, 50, 200);
-      blackHoleCanvas.fill(red(this.trail[i].color), green(this.trail[i].color), blue(this.trail[i].color), alpha);
+      blackHoleCanvas.fill(
+        red(this.trail[i].color),
+        green(this.trail[i].color),
+        blue(this.trail[i].color),
+        alpha
+      );
       blackHoleCanvas.noStroke();
       blackHoleCanvas.ellipse(this.trail[i].x, this.trail[i].y, 5, 5);
     }
   }
+
 }
+
+
